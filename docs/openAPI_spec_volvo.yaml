@@ -1,0 +1,326 @@
+openapi: 3.0.3
+info:
+  title: Technical Test Volvo October 2022
+  description: |-
+    This is a standalone Java Application exposing a rest API for the technical test 
+  contact:
+    email: maiconrodriguessc@gmail.com
+  version: 1.0.0
+
+tags:
+  - name: customer
+    description: Requests for customer
+  - name: customer address
+    description: Requests for customer address
+    
+paths:
+  /customer:
+      get:
+        tags: 
+        - customer
+        summary: Find all customers
+        description: Returns a list of all customers
+        operationId: findAllCustomers
+        parameters:
+        - in: query
+          name: zipCode
+          description: Zip code value that need to be considered for querying by zip code
+          required: false
+          schema:
+            type: integer
+            default: 99999-999
+        responses:
+          '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CustomerResponseBody'
+          '500':
+            description: Internal Server Error
+      post:
+        tags:
+          - customer
+        summary: Add a new customer
+        description: Add a new customer
+        operationId: saveCustomer
+        requestBody:
+          description: Create a new customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerRequestBody'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CustomerRequestBody'
+            application/x-www-form-urlencoded:
+              schema:
+                $ref: '#/components/schemas/CustomerRequestBody'
+          required: true
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CustomerResponseBodyEmptyAddress'          
+              application/xml:
+                schema:
+                  $ref: '#/components/schemas/CustomerResponseBodyEmptyAddress'
+          '400':
+            description: Bad Request
+          '500':
+            description: Internal Server Error
+  /customer/{documentId}:
+    put:
+      tags:
+        - customer
+      summary: Update an existing customer
+      description: Update an existing customer by Document Id
+      operationId: updateCustomer
+      parameters:
+      - name: documentId
+        in: path
+        description: Document ID value that needs to be considered for this request
+        required: true
+        schema:
+          type: integer
+          default: 1
+      requestBody:
+        description: Update an existent customer
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdateRequestBody'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdateRequestBody'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdateRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponseBodyEmptyAddress'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CustomerResponseBodyEmptyAddress'
+        '404':
+          description: Customer not found
+        '500':
+          description: Internal Server Error
+    get:
+      tags: 
+        - customer
+      summary: Find customer by document id
+      description: Returns a customer from the specified document id
+      operationId: findCustomerById
+      parameters:
+        - name: documentId
+          in: path
+          description: Document Id value that need to be considered for querying
+          required: true
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponseBody'          
+            application/xml:
+              schema:
+               $ref: '#/components/schemas/CustomerResponseBody'
+        '404':
+          description: Customer not found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags: 
+        - customer
+      summary: Delete customer by document id
+      description: Deletes a customer from the specified document id
+      operationId: deleteCustomerById
+      parameters:
+        - name: documentId
+          in: path
+          description: Document Id value that needs to be considered for this resquest
+          required: true
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '204':
+          description: Successful operation
+        '404':
+          description: Customer not found
+        '500':
+          description: Internal Server Error
+  /customer/{documentId}/address:
+    post:
+      tags:
+        - customer address
+      summary: Add a new customer address
+      description: Add a new customer address
+      operationId: saveCustomerAddress
+      parameters:
+        - name: documentId
+          in: path
+          description: Customer's document Id value that needs to be considered for this resquest
+          required: true
+          schema:
+            type: integer
+            default: 1
+      requestBody:
+        description: Create a new customer address
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressRequestBody'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AddressRequestBody'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddressRequestBody'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponseBody'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AddressResponseBody'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /customer/{documentId}/address/{addressId}:
+    delete:
+      tags:
+        - customer address
+      summary: Delete a customer address
+      description: Delete customer address
+      operationId: deleteCustomerAddress
+      parameters:
+        - name: documentId
+          in: path
+          description: Customer's document Id value that needs to be considered for this resquest
+          required: true
+          schema:
+            type: integer
+            default: 1
+        - name: addressId
+          in: path
+          description: Address' Id value that needs to be considered for this resquest
+          required: true
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '204':
+          description: Successful operation
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          
+          
+components:
+  schemas:
+    CustomerRequestBody:
+          type: object
+          properties:
+            documentId:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: John Doe
+            age:
+              type: integer
+              example: 30
+    CustomerUpdateRequestBody:
+          type: object
+          properties:
+            name:
+              type: string
+              example: John Doe
+            age:
+              type: integer
+              example: 30
+    CustomerResponseBodyEmptyAddress:
+        type: object
+        properties:
+          documentId:
+            type: integer
+            example: 1
+          name:
+            type: string
+            example: John Doe
+          age:
+            type: integer
+            example: 30
+          registrationDate:
+            type: string
+            format: date-time
+          lastUpdate:
+            type: string
+            format: date-time
+    CustomerResponseBody:
+        type: object
+        properties:
+          documentId:
+            type: integer
+            example: 1
+          name:
+            type: string
+            example: John Doe
+          age:
+            type: integer
+            example: 30
+          registrationDate:
+            type: string
+            format: date-time
+          lastUpdate:
+            type: string
+            format: date-time
+          addresses:
+            type: array
+            xml:
+              name: addresses
+              wrapped: true
+            items: 
+              $ref: '#/components/schemas/AddressResponseBody'
+    AddressRequestBody:
+      type: object
+      properties:
+        zipCode:
+          type: string
+          example: 99999-999
+        number:
+          type: integer
+          example: 123
+    AddressResponseBody:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        zipCode:
+          type: string
+          example: 99999-999
+        number:
+          type: integer
+          example: 123
